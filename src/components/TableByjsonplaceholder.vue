@@ -4,7 +4,7 @@
 import { ref } from 'vue'
 /* iNTERFACE FOR RESPONSE */
 interface jsonplaceholderResponse {
-    name: number,
+    name: string,
     id: number,
     email: string,
     body: string
@@ -18,6 +18,7 @@ const props = defineProps<{
 const emits = defineEmits(["changePageJsonpPlaceholder"])
 const page = ref<number>(1);
 const dialogTableVisible = ref(false);
+const dialogNewUser = ref(false);
 const userSelected = ref();
 
 /* To get news users */
@@ -40,13 +41,38 @@ const handleSelectRow = (user: jsonplaceholderResponse) => {
     console.log(userSelected);
 }
 
+
+const ShowCreateUser = () => {
+    userSelected.value = {};
+    dialogNewUser.value = true;
+}
+
+const createdRow = () => {
+    if (props.tableData) {
+        const newUser = {
+            name: userSelected.value.name || '',
+            id: userSelected.value.id || 0,
+            email: userSelected.value.email || '',
+            body: userSelected.value.body || ''
+        }
+
+        props.tableData.push(newUser)
+        dialogNewUser.value = false
+
+    }
+
+}
+
+
 </script>
 <template>
     <!-- table and titule -->
-    <h1 class="TableName001" >{{  tableName ? tableName : 'Name here'  }}</h1>
+    <h1 class="TableName001">{{  tableName ? tableName : 'Name here'  }}</h1>
     <div class="divElementUi001">
         <el-button type="success" @click="nextAndBackPage()">Back page </el-button>
         <el-button type="success" @click="nextAndBackPage('next')">Next page</el-button>
+        <el-button type="info" @click="ShowCreateUser()">New User</el-button>
+
     </div>
 
     <el-table :data="tableData">
@@ -87,6 +113,28 @@ const handleSelectRow = (user: jsonplaceholderResponse) => {
             <el-button type="primary" @click="dialogTableVisible = false">Confirm</el-button>
         </div>
     </el-dialog>
+    <!-- Model for new user  -->
+    <el-dialog v-model="dialogNewUser" title="New user">
+        <el-form v-if="dialogNewUser" label-width="80px" :model="userSelected">
+            <el-form-item label="id">
+                <el-input v-model="userSelected.id" placeholder="id" />
+            </el-form-item>
+            <el-form-item label="name">
+                <el-input v-model="userSelected.name" placeholder="name" />
+            </el-form-item>
+            <el-form-item label="email">
+                <el-input v-model="userSelected.email" placeholder="email" />
+            </el-form-item>
+            <el-form-item label="body">
+                <el-input v-model="userSelected.body" type="textarea" :rows="3" placeholder="body" />
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="dialogNewUser = false">Cancel</el-button>
+            <el-button type="primary" @click="createdRow()">Confirm</el-button>
+        </div>
+    </el-dialog>
+
 </template>
 <style scoped>
 .divElementUi001 {
