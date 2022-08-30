@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import TableComponet from './components/TableComponet.vue'
+import  TableRickAndMorty from './components/TableByRickAndMorty.vue'
+import TableByjsonplaceholderVue from './components/TableByjsonplaceholder.vue';
 import { ref, onMounted, } from 'vue'
 import axios, { AxiosRequestConfig, } from 'axios'
 
@@ -34,22 +35,36 @@ interface CharactersResponse {
     },
   ]
 }
+interface jsonplaceholderResponse {
+  userId: number,
+  id: number,
+  title: string,
+  body: string
+}
 
-const url = "https://rickandmortyapi.com/api/character/"
-const dataByGet = ref<CharactersResponse>()
+const rickMortyApiurl = "https://rickandmortyapi.com/api/character/"
+const jsonpPlaceholderApiurl = "https://jsonplaceholder.typicode.com/posts"
 const loadign = ref<boolean>(true);
+const rickAndMortydataTable = ref<CharactersResponse | any>([]);
+const jsonpPlaceholderdataTable = ref<jsonplaceholderResponse | any>([]);
+const tableSelect = ref<string>("jsonpPlaceholder");
 
 
-
-const changePage = (page: number) => {
-  console.log("page", page)
-  getRickAndMortyApi(url, page)
+const changePageJsonpPlaceholder = (page: number) => {
+  getJsonPlaceholderApi(jsonpPlaceholderApiurl, page)
+}
+const changePagerRickAndMorty = (page: number) => {
+  getRickAndMortyApi(rickMortyApiurl, page)
 }
 
 
-async function getRickAndMortyApi(URL: string, page: number, limit: number = 10, config?: AxiosRequestConfig) {
+const SeletTable = (name: string) => {
+  tableSelect.value = name;
+}
+
+const getRickAndMortyApi = async (URL: string, page: number, limit: number = 10, config?: AxiosRequestConfig) => {
   loadign.value = true;
-  dataTable.value = [];
+  rickAndMortydataTable.value = [];
   const arrayForGet = []
   if (limit) {
     for (let i = 1; i < limit + 1; i++) {
@@ -58,18 +73,31 @@ async function getRickAndMortyApi(URL: string, page: number, limit: number = 10,
   }
   try {
     let res = await axios.get(`${URL}/${limit ? arrayForGet : 1}`, config)
-    console.log("Response by getRickAndMortyApi ", res)
     loadign.value = res.data && true;
-    dataTable.value = res.data
+    rickAndMortydataTable.value = res.data
   } catch (error) {
     alert(`Error in Fetch, Message: ${error}`)
   }
 }
 
-const dataTable = ref<any>([]);
+const getJsonPlaceholderApi = async (URL: string, page: number, config?: AxiosRequestConfig) => {
+  loadign.value = true;
+  jsonpPlaceholderdataTable.value = [];
+  console.log(`${URL}/${page}/comments`)
+  try {
+    let res = await axios.get(`${URL}/${page}/comments`, config)
+    console.log("Response by jsonpPlaceholder ", res)
+    loadign.value = res.data && true;
+    jsonpPlaceholderdataTable.value = res.data
+  } catch (error) {
+    alert(`Error in Fetch, Message: ${error}`)
+  }
+}
+
 
 onMounted(async () => {
-  await getRickAndMortyApi(url, 1);
+  await getRickAndMortyApi(rickMortyApiurl, 1);
+  await getJsonPlaceholderApi(jsonpPlaceholderApiurl, 1);
 })
 
 
@@ -88,10 +116,35 @@ onMounted(async () => {
       <img src="./assets/typescript.svg" class="logo typescript" alt="Vue logo" />
     </a>
   </div>
-  <TableComponet :v-if="loadign" tableName="Vue + vite + typescript" :tableData="dataTable" @changePage="changePage" />
+  <!-- buton to change the components -->
+  <div class="buttons">
+    <button class="Button001" @click="SeletTable('rickAndMorty')">Rick And Morty</button>
+    <button class="Button001" @click="SeletTable('jsonpPlaceholder')">JsonPlaceholder</button>
+  </div>
+  <div v-if="tableSelect === 'rickAndMorty'" style="width:100% ;">
+    <TableRickAndMorty :v-if="loadign" tableName="Vue + vite + typescript" :tableData="rickAndMortydataTable"
+      @changePageRickAndMorty="changePagerRickAndMorty" />
+  </div>
+  <div v-else-if="tableSelect === 'jsonpPlaceholder'" style="width:100% ;">
+    <TableByjsonplaceholderVue :v-if="loadign" :tableData="jsonpPlaceholderdataTable" tableName="Vue + Element Ui"
+      @changePageJsonpPlaceholder="changePageJsonpPlaceholder" />
+  </div>
 </template>
 
 <style scoped>
+.Button001 {
+  border: 1px solid #41b883;
+  color: #41b883;
+  text-shadow: 5px 3px 3px #35495e;
+  font-size: 1em;
+}
+
+/* margin in buttons  */
+.buttons {
+  margin-top: 1em;
+
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;

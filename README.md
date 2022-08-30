@@ -14,3 +14,9 @@ Since TypeScript cannot handle type information for `.vue` imports, they are shi
 2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
 
 You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+
+
+3. Although the ferch logic is in the app component, each table or component is intended for a different test.
+Inside, in the name of these components is the Api that was used and the type of component that it is.
+
+4. Within the specific component it will have brief comments explaining logic, if it was really necessary

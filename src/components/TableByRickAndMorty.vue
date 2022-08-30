@@ -18,10 +18,6 @@ export type DataPropsKeys =
     'url'
 
 
-
-
-
-
 export interface DataProps {
     id: number,
     name: string,
@@ -109,18 +105,20 @@ const deafaltDataTable = [{
     url: "https://rickandmortyapi.com/api/character/1",
     created: "2017-11-04T18:48:46.250Z"
 }]
+
 const props = defineProps<{
     tableName?: string, tableData?: DataProps[]
 }>()
-const emits = defineEmits(["changePage"])
+
+const emits = defineEmits(["changePageRickAndMorty"])
+
 const page = ref<number>(0);
 
 
 const nextAndBackPage = (accion: string) => {
     if (page.value === 0 && accion !== 'next') { return alert(`you are already on the first page`) };
     accion === 'next' ? page.value++ : page.value--;
-
-    emits("changePage", page.value)
+    emits("changePageRickAndMorty", page.value);
 }
 
 const handelChangeTable = (e: any, index: number) => {
@@ -140,12 +138,11 @@ const handelChangeTableepisode = (e: any, index: number) => {
 
 <template>
     <div class="container_div">
-        <h1 class="TableName001">{{ tableName ?? "Table name here" }}</h1>
+        <h1 class="TableName001">{{  tableName ?? "Table name here"  }}</h1>
         <table class="table001">
             <tr>
-                <button type="button" @click="nextAndBackPage('previus')">Previous page</button>
-                <button type="button" @click="nextAndBackPage('next')">Next page</button>
-
+                <button class="Button001" type="button" @click="nextAndBackPage('previus')">Previous page</button>
+                <button class="Button001" type="button" @click="nextAndBackPage('next')">Next page</button>
             </tr>
             <tr>
                 <th>Nombre</th>
@@ -156,7 +153,6 @@ const handelChangeTableepisode = (e: any, index: number) => {
                 <th>episode</th>
                 <th>URL</th>
                 <th>created</th>
-
             </tr>
             <tr v-for="(item, index) in tableData ?? deafaltDataTable">
                 <td> <input v-on:change="handelChangeTable($event, index)" type="text" name="name" v-model="item.name">
@@ -197,7 +193,14 @@ const handelChangeTableepisode = (e: any, index: number) => {
 }
 
 .table001 {
-    margin-top: 10%;
+    margin-top: 2%;
+}
+
+.Button001 {
+    border: 1px solid #41b883;
+    color: #41b883;
+    text-shadow: 5px 3px 3px #35495e;
+    font-size: 1em;
 }
 
 .TableName001 {
